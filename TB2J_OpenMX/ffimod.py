@@ -1198,6 +1198,34 @@ for (spin=0; spin<=SpinP_switch; spin++){
 
 }
 
+// fill HR_imag
+for (spin=0; spin<3; spin++){
+  for (II=0; II<atomnum; II++){
+    for (JJ=0; JJ<atomnum; JJ++){
+      ct_AN = II+1 ; //index of atom I
+      // loop over NN list
+      for (h_AN=0; h_AN<=FNAN[ct_AN]; h_AN++){ 
+        // global index of NN atom J
+        Gh_AN = natn[ct_AN][h_AN]; // why not h_AN+1?
+        // or if JJ+1 in NN list
+        if (Gh_AN == JJ+1){
+          iR = ncn[ct_AN][h_AN];
+          for (i=0; i<Total_NumOrbs[ct_AN]; i++){
+            for (j=0; j<Total_NumOrbs[Gh_AN]; j++){
+              HR_imag[iR][spin][i+MP[II+1]-1][j+MP[JJ+1]-1]
+                = iHks[spin][ct_AN][h_AN][i][j];
+            }
+          }
+        }
+      }
+    }
+  }
+ }
+
+}
+
+
+
 
 void free_HSR(){
   int spin, i, iR;
