@@ -1,4 +1,4 @@
-from ffiparser import OpenmxWrapper
+from TB2J_OpenMX.ffiparser import OpenmxWrapper
 from TB2J.exchange import ExchangeNCL
 
 
@@ -33,6 +33,6 @@ def gen_exchange(path,
         print("\n")
         print("All calculation finsihed. The results are in TB2J_results directory.")
 
-
-gen_exchange(
+if __name__=='__main__':
+    gen_exchange(
         path='/home/hexu/projects/TB2J_example/OPENMX/SrMnO3_FM_SOC/', magnetic_elements=['Mn'], nz=50, Rcut=8)
