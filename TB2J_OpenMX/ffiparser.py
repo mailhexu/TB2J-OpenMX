@@ -17,8 +17,6 @@ for prefix in ('int', 'uint'):
     for log_bytes in range(4):
         ctype = '%s%d_t' % (prefix, 8 * (2**log_bytes))
         dtype = '%s%d' % (prefix[0], 2**log_bytes)
-        # print( ctype )
-        # print( dtype )
         ctype2dtype[ctype] = np.dtype(dtype)
 
 ## Floating point types
@@ -29,8 +27,6 @@ ctype2dtype['double'] = np.dtype('f8')
 def asarray(ffi, ptr, length):
     ## Get the canonical C type of the elements of ptr as a string.
     T = ffi.getctype(ffi.typeof(ptr).item)
-    # print( T )
-    # print( ffi.sizeof( T ) )
 
     if T not in ctype2dtype:
         raise RuntimeError("Cannot create an array for element type: %s" % T)
@@ -89,7 +85,6 @@ class OpenmxWrapper():
             self.basis += [[sn[i], f'orb{x+1}','up'] for x in range(n)]
         for i, n in enumerate(norbs):
             self.basis += [[sn[i], f'orb{x+1}','down'] for x in range(n)]
-        print(self.basis)
         return self.basis
 
     def parse_scfoutput(self):
@@ -115,7 +110,6 @@ class OpenmxWrapper():
         ncn = []
         for iatom in range(self.natom):
             ncn.append(asarray(ffi, lib.ncn[iatom + 1], fnan[iatom + 1] + 1))
-
         # atv
         #  x,y,and z-components of translation vector of
         #periodically copied cells
@@ -176,7 +170,7 @@ class OpenmxWrapper():
         self.H[:, :norb, norb:] = HR[:, 2, :, :] + 1j * (HR[:, 3, :, :] +
                                                          HR_imag[:, 2, :, :])
         # down up
-        self.H[:, :norb, norb:] = HR[:, 2, :, :] - 1j * (HR[:, 3, :, :] +
+        self.H[:, norb:, :norb] = HR[:, 2, :, :] - 1j * (HR[:, 3, :, :] +
                                                          HR_imag[:, 2, :, :])
         # down down
         self.H[:, norb:, norb:] = HR[:, 1, :, :] + 1j * HR_imag[:, 1, :, :]
