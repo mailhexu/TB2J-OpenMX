@@ -175,8 +175,8 @@ class OpenmxWrapper():
         # down down
         self.H[:, norb:, norb:] = HR[:, 1, :, :] + 1j * HR_imag[:, 1, :, :]
 
-        self.efermi = lib.ChemP * Ry
-        self.H *= Ry
+        self.efermi = lib.ChemP * Ha
+        self.H *= Ha
 
         SR = np.zeros([self.ncell, lib.T_NumOrbs, lib.T_NumOrbs])
         for iR in range(0, self.ncell):
