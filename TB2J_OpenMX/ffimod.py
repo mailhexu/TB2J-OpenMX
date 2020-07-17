@@ -1196,7 +1196,7 @@ for (spin=0; spin<=SpinP_switch; spin++){
   }
  }
 
-}
+
 
 // fill HR_imag
 for (spin=0; spin<3; spin++){
