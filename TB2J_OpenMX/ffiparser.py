@@ -42,6 +42,9 @@ class OpenmxWrapper():
         self.fname = fname
         self.R2kfactor = 2.0j * np.pi
         self.parse_scfoutput()
+        self.Rdict=dict()
+        for i, R in enumerate(self.R):
+            self.Rdict[tuple(R)]=i
         atoms = read(xyz_fname)
         self.atoms = Atoms(atoms.get_chemical_symbols(),
                            cell=self.cell,
@@ -55,6 +58,7 @@ class OpenmxWrapper():
         Hk = np.einsum('rij, r->ij', self.H, phase)
         Sk = np.einsum('rij, r->ij', self.S, phase)
         return sl.eigh(Hk, Sk)
+
 
     def solve_all(self, kpts):
         nk = len(kpts)
@@ -76,6 +80,10 @@ class OpenmxWrapper():
             Sk[ik] = np.einsum('rij, r->ij', self.S, phase)
             evals[ik], evecs[ik] = sl.eigh(Hk[ik], Sk[ik])
         return Hk, Sk, evals, evecs
+
+
+    def get_hamR(self, R):
+        return self.H[self.Rdict[tuple(R)]]
 
     def norbs_to_basis(self, atoms, norbs):
         self.basis = []
