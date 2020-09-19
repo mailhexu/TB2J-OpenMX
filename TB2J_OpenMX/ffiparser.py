@@ -38,6 +38,7 @@ def asarray(ffi, ptr, length):
 class OpenmxWrapper():
     def __init__(self, path, prefix='openmx'):
         self.is_siesta=False
+        self.is_orthogonal=False
         xyz_fname = os.path.join(path, prefix + '.xyz')
         fname = os.path.join(path, prefix + '.scfout')
         self.fname = fname
@@ -68,6 +69,15 @@ class OpenmxWrapper():
         for ik, k in enumerate(kpts):
             evals[ik], evecs[ik] = self.solve(k)
         return evals, evecs
+
+    def HSE_k(self, k, convention=2):
+        phase = np.exp(self.R2kfactor * (self.R @ k))
+        Hk = np.einsum('rij, r->ij', self.H, phase)
+        Sk = np.einsum('rij, r->ij', self.S, phase)
+        evalue, evec = sl.eigh(Hk, Sk)
+        return Hk, Sk, evalue, evec
+
+
 
     def HS_and_eigen(self, kpts):
         nk = len(kpts)
