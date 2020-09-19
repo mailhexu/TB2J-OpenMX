@@ -37,6 +37,7 @@ def asarray(ffi, ptr, length):
 
 class OpenmxWrapper():
     def __init__(self, path, prefix='openmx'):
+        self.is_siesta=False
         xyz_fname = os.path.join(path, prefix + '.xyz')
         fname = os.path.join(path, prefix + '.scfout')
         self.fname = fname
