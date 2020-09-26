@@ -1,0 +1,32 @@
+language: python
+jobs:
+  include:
+  - services: docker
+  - os: osx
+    language: shell
+  - os: windows
+    language: shell
+    before_install:
+    - choco install python --version 3.8.0
+    - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
+    - ln -s /c/Python38/python.exe /c/Python38/python3.exe
+env:
+  global:
+  - TWINE_USERNAME=__token__
+install:
+- python3 -m pip install cibuildwheel==1.6.1
+- python3 -m pip install TB2J
+script:
+- python3 -m cibuildwheel --output-dir wheelhouse
+after_success:
+- |
+  if [[ $TRAVIS_TAG ]]; then
+    python3 -m pip install twine
+    python3 -m twine upload wheelhouse/*.whl
+  fi
+depoly:
+  provider: pypi
+  username: __token__
+  skip_existing: true
+  password:
+    secure: uUWto3DCdL1O2tRehrVsW32bazBQa7fbtQmXmExaBinNW0pj/nO8VI+kiqqx0k5G1CU3Iv+XGdXtoNKKL6MtneC5lP7Vx4qLH9kpadoh1SXiLHTnZdpulXYsixLT3E3denU+/dL1xjheyKR+53HS/Q2Mg837oHt45wCBnC59V4MMiNwoYO0rH7fq8raJMPcEcO7eFolgmJtQaK7WzaVfLycMnbbbm+evpJNcOplxu+GUdqoP4J6KdtqNaz2NxulcEeEcbAD9S4xVOT4jq1+EkoMFDzoCpCZ+pu/fZcqA2khMy9bRgC7rzewrJhhXoO3jzD0Jl4jxEWnUE3hQYAq0X+xTdhSpNhXW4XpHQZC8wKy0IHOKqVAiyM1zG1Bx2At6GuC460OTZum7Y52ugtBYuQtWfMlj3sz4cEw35Ok1Sm9rHVlym4eW8j0FWzTfV6v034Xftzn7YfZ3ZafozrzRS44kM24XCTsGWtWHBYE0TaSXagiikp4wcHiFh7fHvTnlLXMq2snLHtmSiHOzbSjHCBJ1BEfuVOpqjHFvfFpahBWCIv750G6xLP8TzM2VbYRD3jxpcjlHXOtQC6JJ6PWF3uCyEoPyn5yELSEc3h+R6dC2ED9XaX44eCemDIEKFPj0mz/WQ8Yv+jiQPQcuvUo3SiviTy02sE+Fhc4n2zIANYg=
