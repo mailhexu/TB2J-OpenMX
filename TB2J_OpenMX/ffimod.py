@@ -405,12 +405,12 @@ void Input( FILE *fp )
     puts("***");
 
     printf("The file format of the SCFOUT file:  %d\n", version);
-    puts("And it supports the following functions:");
-    puts("- jx");
-    puts("- polB");
-    puts("- kSpin");
-    puts("- Z2FH");
-    puts("- calB");
+    //puts("And it supports the following functions:");
+    //puts("- jx");
+    //puts("- polB");
+    //puts("- kSpin");
+    //puts("- Z2FH");
+    //puts("- calB");
     puts("***");
 
   /* ***/

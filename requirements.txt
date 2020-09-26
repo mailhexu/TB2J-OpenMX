@@ -3,5 +3,7 @@ scipy
 matplotlib
 ase
 progressbar
+cffi
+TB2J
 
 

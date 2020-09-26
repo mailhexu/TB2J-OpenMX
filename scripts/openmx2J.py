@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import argparse
-from TB2J.manager import gen_exchange_siesta
 from TB2J.versioninfo import print_license
-from TB2J_OpenMX import gen_exchange
+from TB2J_OpenMX.gen_exchange import gen_exchange
 
-def run_siesta2J():
+def run_openmx2J():
     print_license()
+    print("\n")
     parser = argparse.ArgumentParser(
         description=
         "openmx2J: Using magnetic force theorem to calculate exchange parameter J from openmx Hamiltonian"
@@ -74,7 +74,7 @@ def run_siesta2J():
         help=
         "add description of the calculatiion to the xml file. Essential information, like the xc functional, U values, magnetic state should be given.",
         type=str,
-        default="Calculated with TB2J.")
+        default="Calculated with TB2J.\n")
 
     parser.add_argument(
         "--fname",
@@ -88,6 +88,7 @@ def run_siesta2J():
         print("Please input the magnetic elements, e.g. --elements Fe Ni")
         exit()
     gen_exchange(
+        path='./',
         prefix=args.prefix,
         kmesh=args.kmesh,
         magnetic_elements=args.elements,
@@ -104,4 +105,4 @@ def run_siesta2J():
         exclude_orbs=args.exclude_orbs)
 
 if __name__ == "__main__":
-    run_siesta2J()
+    run_openmx2J()

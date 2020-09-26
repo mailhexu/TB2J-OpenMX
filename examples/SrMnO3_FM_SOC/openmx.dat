@@ -1,0 +1,60 @@
+System.CurrentDirectory        /home/ICN2/xhe/projects/TB2J_examples/OPENMX/SrMnO3_FM_SOC/openmx
+System.Name        openmx
+DATA.PATH        /home/ICN2/xhe/.local/pp/openmx/DFT_DATA19
+Species.Number        3
+
+<Definition.of.Atomic.Species
+    Sr  Sr10.0-s2p2d2f1  Sr_PBE19
+    Mn  Mn8.0-s2p2d2f1  Mn_PBE19
+    O  O6.0-s2p2d1  O_PBE19
+Definition.of.Atomic.Species>
+
+
+Atoms.Number        5
+Atoms.SpeciesAndCoordinates.Unit        Ang
+<Atoms.SpeciesAndCoordinates
+    1  Sr  0.0  0.0  0.0  5.0  5.0 0 0 0 0 0 off
+    2  Mn  1.902221982  1.902221118  1.9022242715  9.0  6.0 0 0 0 0  0 off
+    3  O  0.0  1.902221118  1.9022242715  3.0  3.0 0 0 0 0 0 off
+    4  O  1.902221982  0.0  1.9022242715  3.0  3.0 0 0 0 0 0 off
+    5  O  1.902221982  1.902221118  0.0  3.0  3.0 0 0 0 0 0 off
+Atoms.SpeciesAndCoordinates>
+
+Atoms.UnitVectors.Unit        Ang
+<Atoms.UnitVectors
+    3.804443964  -0.0  0.0
+    -0.0  3.804442236  0.0
+    0.0  0.0  3.804448543
+Atoms.UnitVectors>
+
+
+scf.Hubbard.U ON
+scf.DFTU.Type 1
+<Hubbard.U.values   # eV
+    Sr 1s 0.0 2s 0.0 1p 0.0 2p 0.0 1d 0.0 2d 0.0 1f 0.0
+    Mn 1s 0.0 2s 0.0 1p 0.0 2p 0.0 1d 3.0 2d 0.0 1f 0.0
+    O  1s 0.0 2s 0.0 1p 0.0 2p 0.0 1d 0.0
+Hubbard.U.values>
+
+<Hund.J.values      # eV
+    Sr 1s 0.0 2s 0.0 1p 0.0 2p 0.0 1d 0.0 2d 0.0 1f 0.0
+    Mn 1s 0.0 2s 0.0 1p 0.0 2p 0.0 1d 0.0 2d 0.0 1f 0.0
+    O  1s 0.0 2s 0.0 1p 0.0 2p 0.0 1d 0.0
+Hund.J.values>
+
+
+
+scf.Kgrid        6 6 6
+scf.maxIter        100
+scf.Mixing.History        15
+scf.ElectronicTemperature        1000
+scf.energycutoff        150
+scf.Init.Mixing.Weight        0.001
+scf.Min.Mixing.Weight        0.001
+scf.Max.Mixing.Weight        0.3
+scf.XcType        GGA-PBE
+scf.SpinPolarization        NC
+scf.EigenvalueSolver        band
+scf.Mixing.Type        RMM-DIISK
+scf.SpinOrbit.Coupling        On
+HS.fileout        On

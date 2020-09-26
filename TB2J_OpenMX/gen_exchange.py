@@ -1,5 +1,6 @@
 from TB2J_OpenMX.ffiparser import OpenmxWrapper
 from TB2J.exchange import ExchangeNCL
+import os
 
 
 def gen_exchange(path,
@@ -11,11 +12,15 @@ def gen_exchange(path,
                  nz=100,
                  exclude_orbs=[],
                  Rcut=None,
-                 description=''):
+                 use_cache=False,
+                 description=None):
     tbmodel=OpenmxWrapper(path, prefix)
-    print(tbmodel.efermi)
     if tbmodel.non_collinear:
         print("Starting to calculate exchange.")
+        description=f"""Using OpenMX data: 
+  path: {os.path.abspath(path)}
+  prefix: {prefix}
+ """
         exchange = ExchangeNCL(
             tbmodels=tbmodel,
             atoms=tbmodel.atoms,
@@ -28,6 +33,7 @@ def gen_exchange(path,
             nz=nz,
             exclude_orbs=exclude_orbs,
             Rcut=Rcut,
+            use_cache=use_cache,
             description=description)
         exchange.run()
         print("\n")
