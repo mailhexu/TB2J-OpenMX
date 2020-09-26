@@ -5,8 +5,6 @@ TB2J-OpenMX/cmod/*.so
 # Latex 
 *.aux
 
-# xyz files
-*.xyz
 
 .DS_Store
 
