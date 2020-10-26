@@ -1,5 +1,5 @@
 from TB2J_OpenMX.ffiparser import OpenmxWrapper
-from TB2J.exchange import ExchangeNCL
+from TB2J.exchange import ExchangeNCL, ExchangeCL
 import os
 
 
@@ -16,13 +16,16 @@ def gen_exchange(path,
                  description=None):
     tbmodel=OpenmxWrapper(path, prefix)
     #if tbmodel.non_collinear:
-    if True:
+    if tbmodel.non_collinear:
+        Exchange=ExchangeNCL
+    else:
+        Exchange=ExchangeCL
         print("Starting to calculate exchange.")
         description=f"""Using OpenMX data: 
   path: {os.path.abspath(path)}
   prefix: {prefix}
  """
-        exchange = ExchangeNCL(
+        exchange = Exchange(
             tbmodels=tbmodel,
             atoms=tbmodel.atoms,
             basis=tbmodel.basis,
