@@ -402,6 +402,8 @@ void Input( FILE *fp )
     exit(0);
   }
 
+      //printf("SpinP_switch %d", SpinP_switch);
+
     puts("***");
 
     printf("The file format of the SCFOUT file:  %d\n", version);
@@ -638,6 +640,8 @@ void Input( FILE *fp )
     }
   }
 
+  //printf("Hks col alloc OK!\n");
+
   /* Added by N. Yamaguchi ***/
   if (SpinP_switch==3){
     /* ***/
@@ -667,6 +671,8 @@ void Input( FILE *fp )
       }
     }
 
+  //printf("Hks non-col alloc OK!\n");
+
     /* Added by N. Yamaguchi ***/
   }
   /* ***/
@@ -690,6 +696,8 @@ void Input( FILE *fp )
       }
     }
   }
+
+  //printf("Overlap matrix read OK!\n");
 
   /* Added by N. Yamaguchi ***/
 
@@ -1134,6 +1142,7 @@ void prepare_HSR(){
     }
   }
 
+if(SpinP_switch==3) {
   HR_imag = (double****)malloc(sizeof(double***)*(TCpyCell+1));
   for (iR=0; iR<TCpyCell+1; iR++){
     HR_imag[iR]= (double***)malloc(sizeof(double**)*3);
@@ -1147,6 +1156,7 @@ void prepare_HSR(){
       }
     }
   }
+}
 
 
   // allocate SR
@@ -1199,6 +1209,7 @@ for (spin=0; spin<=SpinP_switch; spin++){
 
 
 // fill HR_imag
+if (SpinP_switch==3){
 for (spin=0; spin<3; spin++){
   for (II=0; II<atomnum; II++){
     for (JJ=0; JJ<atomnum; JJ++){
@@ -1221,6 +1232,10 @@ for (spin=0; spin<3; spin++){
     }
   }
  }
+ }
+
+
+  //printf("Hks nc read OK!\n");
 
 }
 
@@ -1243,6 +1258,7 @@ void free_HSR(){
 
 
 
+  if(SpinP_switch==3) {
   for (iR=0; iR<TCpyCell+1; iR++){
     for (spin=0; spin<=2; spin++){
       for (i=0; i<T_NumOrbs; i++){
@@ -1253,6 +1269,7 @@ void free_HSR(){
     free(HR_imag[iR]);
   }
   free(HR_imag);
+  }
 
 
 

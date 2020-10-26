@@ -120,7 +120,7 @@ class OpenmxWrapper():
             self.non_collinear = False
         else:
             raise ValueError(
-                "Can only get J from collinear and non-collinear mode.")
+                " The value of SpinP_switch is %s. Can only get J from collinear and non-collinear mode."%lib.SpinP_switch)
 
         fnan = asarray(ffi, lib.FNAN, self.natom + 1)
 
@@ -200,6 +200,7 @@ class OpenmxWrapper():
             # down down
             self.H[:, norb:, norb:] = HR[:, 1, :, :] + 1j * HR_imag[:, 1, :, :]
         else:  # collinear
+
             HR = np.zeros([self.ncell, 4, lib.T_NumOrbs, lib.T_NumOrbs])
             for iR in range(0, self.ncell):
                 for ispin in range(lib.SpinP_switch + 1):
@@ -233,7 +234,7 @@ class OpenmxWrapper():
         self.S = np.kron(np.eye(2), SR)
         lib.free_HSR()
         lib.free_scfout()
-
+        print("Loading from scfout file OK!")
 
 def test():
     openmx = OpenmxWrapper(

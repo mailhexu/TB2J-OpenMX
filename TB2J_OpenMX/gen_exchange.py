@@ -15,7 +15,8 @@ def gen_exchange(path,
                  use_cache=False,
                  description=None):
     tbmodel=OpenmxWrapper(path, prefix)
-    if tbmodel.non_collinear:
+    #if tbmodel.non_collinear:
+    if True:
         print("Starting to calculate exchange.")
         description=f"""Using OpenMX data: 
   path: {os.path.abspath(path)}
