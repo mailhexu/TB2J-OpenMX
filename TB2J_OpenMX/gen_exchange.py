@@ -15,7 +15,6 @@ def gen_exchange(path,
                  use_cache=False,
                  description=None):
     tbmodel=OpenmxWrapper(path, prefix)
-    #if tbmodel.non_collinear:
     if tbmodel.non_collinear:
         Exchange=ExchangeNCL
     else:
