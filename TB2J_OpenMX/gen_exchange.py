@@ -19,11 +19,11 @@ def gen_exchange(path,
         Exchange=ExchangeNCL
     else:
         Exchange=ExchangeCL
-        print("Starting to calculate exchange.")
-        description=f"""Using OpenMX data: 
-  path: {os.path.abspath(path)}
-  prefix: {prefix}
- """
+    print("Starting to calculate exchange.")
+    description=f"""Using OpenMX data: 
+path: {os.path.abspath(path)}
+prefix: {prefix}
+"""
     exchange = Exchange(
             tbmodels=tbmodel,
             atoms=tbmodel.atoms,
