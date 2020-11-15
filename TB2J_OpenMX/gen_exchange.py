@@ -24,7 +24,7 @@ def gen_exchange(path,
   path: {os.path.abspath(path)}
   prefix: {prefix}
  """
-        exchange = Exchange(
+    exchange = Exchange(
             tbmodels=tbmodel,
             atoms=tbmodel.atoms,
             basis=tbmodel.basis,
@@ -38,9 +38,9 @@ def gen_exchange(path,
             Rcut=Rcut,
             use_cache=use_cache,
             description=description)
-        exchange.run()
-        print("\n")
-        print("All calculation finsihed. The results are in TB2J_results directory.")
+    exchange.run()
+    print("\n")
+    print("All calculation finsihed. The results are in TB2J_results directory.")
 
 if __name__=='__main__':
     gen_exchange(
