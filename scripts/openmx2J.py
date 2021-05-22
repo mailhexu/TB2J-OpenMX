@@ -40,26 +40,11 @@ def run_openmx2J():
         default=0.05)
     parser.add_argument(
         '--use_cache',
-        help="whether to use disk file for temporary storing wavefunctions and hamiltonian to reduce energy usage. Default: False",
+        help="whether to use disk file for temporary storing wavefunctions and hamiltonian to reduce memory usage. Default: False",
         action='store_true',
         default=False)
-    #parser.add_argument(
-    #    '--height',
-    #    help=
-    #    'energy contour, a small number (often between 0.1 to 0.5, default 0.2)',
-    #    type=float,
-    #    default=0.1)
     parser.add_argument(
         '--nz', help='number of integration steps, default: 50', default=50, type=int)
-    #parser.add_argument(
-    #    '--nz2', help='number of steps 2, default: 200', default=200, type=int)
-    #parser.add_argument(
-    #    '--nz3', help='number of steps 3, default: 50', default=50, type=int)
-    #parser.add_argument(
-    #    '--cutoff',
-    #    help="The minimum of J amplitude to write, (in eV), default is 1e-5 eV",
-    #    default=1e-5,
-    #    type=float)
 
     parser.add_argument(
         '--exclude_orbs',
@@ -96,10 +81,6 @@ def run_openmx2J():
         emin=args.emin,
         emax=args.emax,
         nz=args.nz,
-        #height=args.height,
-        #nz1=args.nz1,
-        #nz2=args.nz2,
-        #nz3=args.nz3,
         description=args.description,
         use_cache=args.use_cache,
         exclude_orbs=args.exclude_orbs)

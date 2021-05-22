@@ -99,9 +99,9 @@ class OpenmxWrapper():
         symbols = atoms.get_chemical_symbols()
         sn = list(symbol_number(symbols).keys())
         for i, n in enumerate(norbs):
-            self.basis += [[sn[i], f'orb{x+1}', 'up'] for x in range(n)]
-        for i, n in enumerate(norbs):
-            self.basis += [[sn[i], f'orb{x+1}', 'down'] for x in range(n)]
+            for x in range(n):
+                self.basis .append((sn[i], f'orb{x+1}', 'up'))
+                self.basis .append((sn[i], f'orb{x+1}', 'down'))
         return self.basis
 
     def parse_scfoutput(self):
@@ -176,7 +176,7 @@ class OpenmxWrapper():
                            iorb, :] = asarray(ffi, lib.HR[iR][ispin][iorb],
                                               norb)
 
-            HR_imag = np.zeros([self.ncell, 4, lib.T_NumOrbs, lib.T_NumOrbs])
+            HR_imag = np.zeros([self.ncell, 3, lib.T_NumOrbs, lib.T_NumOrbs])
             for iR in range(0, self.ncell):
                 for ispin in range(3):
                     for iorb in range(lib.T_NumOrbs):
@@ -188,17 +188,18 @@ class OpenmxWrapper():
                 dtype=complex)
 
             # up up
-            self.H[:, :norb, :norb] = HR[:, 0, :, :] + 1j * HR_imag[:, 0, :, :]
-            # up down
-            self.H[:, :norb,
-                   norb:] = HR[:, 2, :, :] + 1j * (HR[:, 3, :, :] +
-                                                   HR_imag[:, 2, :, :])
-            # down up
-            self.H[:,
-                   norb:, :norb] = HR[:, 2, :, :] - 1j * (HR[:, 3, :, :] +
-                                                          HR_imag[:, 2, :, :])
-            # down down
-            self.H[:, norb:, norb:] = HR[:, 1, :, :] + 1j * HR_imag[:, 1, :, :]
+            for iR in range(self.ncell):
+                self.H[iR, ::2, ::2] = HR[iR, 0, :, :] + 1j * HR_imag[iR, 0, :, :]
+                # up down
+                self.H[iR, ::2,
+                   1::2] = HR[iR, 2, :, :] + 1j * (HR[iR, 3, :, :] +
+                                                   HR_imag[iR, 2, :, :])
+                # down up
+                self.H[iR,
+                   1::2, ::2] = HR[iR, 2, :, :] - 1j * (HR[iR, 3, :, :] +
+                                                          HR_imag[iR, 2, :, :])
+                # down down
+                self.H[iR, 1::2, 1::2] = HR[iR, 1, :, :] + 1j * HR_imag[iR, 1, :, :]
         else:  # collinear
 
             HR = np.zeros([self.ncell, 4, lib.T_NumOrbs, lib.T_NumOrbs])
@@ -214,16 +215,9 @@ class OpenmxWrapper():
                 dtype=complex)
 
             # up up
-            self.H[:, :norb, :norb] = HR[:, 0, :, :]
-            self.H[:, norb:, norb:] = HR[:, 1, :, :]
-            # HR = np.zeros([self.ncell, 2, lib.T_NumOrbs, lib.T_NumOrbs])
-            # for iR in range(0, self.ncell):
-            #     for ispin in range(lib.SpinP_switch + 1):
-            #         for iorb in range(lib.T_NumOrbs):
-            #             HR[iR, ispin,
-            #                iorb, :] = asarray(ffi, lib.HR[iR][ispin][iorb],
-            #                                   norb)
-            #self.H = np.copy(HR)
+            for iR in range(self.ncell):
+                self.H[iR, ::2, ::2] = HR[iR, 0, :, :]
+                self.H[iR, 1::2, 1::2] = HR[iR, 1, :, :]
         self.efermi = lib.ChemP * Ha
         self.H *= Ha
 
@@ -231,7 +225,7 @@ class OpenmxWrapper():
         for iR in range(0, self.ncell):
             for iorb in range(lib.T_NumOrbs):
                 SR[iR, iorb, :] = asarray(ffi, lib.SR[iR][iorb], norb)
-        self.S = np.kron(np.eye(2), SR)
+        self.S = np.kron( SR, np.eye(2))
         lib.free_HSR()
         lib.free_scfout()
         print("Loading from scfout file OK!")
@@ -240,7 +234,6 @@ def test():
     openmx = OpenmxWrapper(
         path='/home/hexu/projects/TB2J_example/OPENMX/SrMnO3_FM_SOC/')
     #hsr = openmx.parse_scfoutput()
-
     #from banddownfolder.plot import plot_band
     #plot_band(hsr)
     #plt.savefig('band.pdf')
