@@ -1,5 +1,5 @@
 # TB2J-OpenMX
-[![Build Status](https://travis-ci.org/mailhexu/TB2J-OpenMX.svg?branch=master)](https://travis-ci.org/mailhexu/TB2J-OpenMX)
+[![Build Status](https://travis-ci.com/mailhexu/TB2J-OpenMX.svg?branch=master)](https://travis-ci.com/mailhexu/TB2J-OpenMX)
 
 ## Description
 The TB2J interface to OpenMX.
@@ -18,7 +18,10 @@ The features include:
  - Versatile API on both the input (DFT Hamiltonian) and the output (Heisenberg model) sides.
 
 For more information, see the documentation on
- <https://tb2j.readthedocs.io/en/latest/>
+ <https://tb2j.readthedocs.io/en/latest/> .
+
+The section on TB2J-OpenMX can be found at
+ <https://tb2j.readthedocs.io/en/latest/src/openmx.html> .
 
 The link to TB2J:
  <https://github.com/mailhexu/TB2J>

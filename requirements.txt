@@ -4,6 +4,6 @@ matplotlib
 ase
 progressbar
 cffi
-TB2J
+TB2J>0.6
 
 
