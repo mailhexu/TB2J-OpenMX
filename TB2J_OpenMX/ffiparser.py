@@ -6,6 +6,7 @@ from ase.units import Ha, Bohr, Ry
 from ase.io import read
 from ase import Atoms
 from TB2J.utils import kmesh_to_R, symbol_number
+from TB2J.myTB import  AbstractTB
 import matplotlib.pyplot as plt
 from TB2J_OpenMX.cmod._scfout_parser import ffi, lib
 import copy
@@ -36,7 +37,7 @@ def asarray(ffi, ptr, length):
                          ctype2dtype[T])
 
 
-class OpenmxWrapper():
+class OpenmxWrapper(AbstractTB):
     def __init__(self, path, prefix='openmx'):
         self.is_siesta = False
         self.is_orthogonal = False
@@ -55,6 +56,7 @@ class OpenmxWrapper():
         self.norbs_to_basis(self.atoms, self.norbs)
         self.nspin = 2
         self.nbasis = self.nspin * self.norb
+        self._name='OpenMX'
 
     def solve(self, k):
         phase = np.exp(self.R2kfactor * (self.R @ k))
