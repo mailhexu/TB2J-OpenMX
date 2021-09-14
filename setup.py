@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 import sys
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 long_description = """Interface of TB2J to OpenMX. 
 TB2J is a Python package aimed to compute automatically the magnetic interactions (superexchange  and Dzyaloshinskii-Moriya) between atoms of magnetic crystals from DFT Hamiltonian based on Wannier functions or Linear combination of atomic orbitals. It uses the Green's function method and take the local rigid spin rotation as a perturbation. The package can take the output from Wannier90, which is interfaced with many density functional theory codes or from codes based on localised orbitals. A minimal user input is needed, which allows for an easily integration into a high-throughput workflows.
@@ -20,7 +20,7 @@ setup(
     packages=find_packages(),
     cffi_modules=["TB2J_OpenMX/ffimod.py:ffi"],
     scripts=["scripts/openmx2J.py"],
-    install_requires=['numpy', 'scipy', 'matplotlib', 'ase', 'progressbar', 'TB2J>=0.6.0', 'cffi'],
+    install_requires=['numpy', 'scipy', 'matplotlib', 'ase',  'TB2J>=0.6.0', 'cffi'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3',
