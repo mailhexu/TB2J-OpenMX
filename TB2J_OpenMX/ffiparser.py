@@ -6,24 +6,24 @@ from ase.units import Ha, Bohr, Ry
 from ase.io import read
 from ase import Atoms
 from TB2J.utils import kmesh_to_R, symbol_number
-from TB2J.myTB import  AbstractTB
+from TB2J.myTB import AbstractTB
 import matplotlib.pyplot as plt
 from TB2J_OpenMX.cmod._scfout_parser import ffi, lib
 import copy
 
 ## Create the dictionary mapping ctypes to np dtypes.
-ctype2dtype = {'int': 'i4', 'double': 'f8'}
+ctype2dtype = {"int": "i4", "double": "f8"}
 
 ## Integer types
-for prefix in ('int', 'uint'):
+for prefix in ("int", "uint"):
     for log_bytes in range(4):
-        ctype = '%s%d_t' % (prefix, 8 * (2**log_bytes))
-        dtype = '%s%d' % (prefix[0], 2**log_bytes)
+        ctype = "%s%d_t" % (prefix, 8 * (2**log_bytes))
+        dtype = "%s%d" % (prefix[0], 2**log_bytes)
         ctype2dtype[ctype] = np.dtype(dtype)
 
 ## Floating point types
-ctype2dtype['float'] = np.dtype('f4')
-ctype2dtype['double'] = np.dtype('f8')
+ctype2dtype["float"] = np.dtype("f4")
+ctype2dtype["double"] = np.dtype("f8")
 
 
 def asarray(ffi, ptr, length):
@@ -33,16 +33,45 @@ def asarray(ffi, ptr, length):
     if T not in ctype2dtype:
         raise RuntimeError("Cannot create an array for element type: %s" % T)
 
-    return np.frombuffer(ffi.buffer(ptr, length * ffi.sizeof(T)),
-                         ctype2dtype[T])
+    return np.frombuffer(ffi.buffer(ptr, length * ffi.sizeof(T)), ctype2dtype[T])
+
+
+def reorder(Hk):
+    n = np.shape(Hk)[0] / 2
+    N = 2 * n
+    Hk2 = np.zeros_like(Hk)
+    Hk2[0:n, 0:n] = Hk[::2, ::2]
+    Hk2[n:N, n:N] = Hk[1::2, 1::2]
+    Hk2[0:n, n:N] = Hk[::2, 1::2]
+    Hk2[n:N, 0:n] = Hk[1::2, ::2]
+    return Hk2
+
+
+def reorder_back(Hk2):
+    n = np.shape(Hk)[0] / 2
+    N = 2 * n
+    Hk2 = np.zeros_like(Hk)
+    Hk2[::2, ::2] = Hk[0:n, 0:n]
+    Hk2[1::2, 1::2] = Hk[n:N, n:N]
+    Hk2[::2, 1::2] = Hk[0:n, n:N]
+    Hk2[1::2, ::2] = Hk[n:N, 0:n]
+    return Hk2
+
+
+def reorder_and_solve_and_back(Hk, Sk):
+    Hk2 = reorder(Hk)
+    Sk2 = reorder(Sk)
+    evalue, evecs = sl.eigh(Hk2, Sk2)
+    evecs = reorder(evecs)
+    return evalue, evecs
 
 
 class OpenmxWrapper(AbstractTB):
-    def __init__(self, path, prefix='openmx'):
+    def __init__(self, path, prefix="openmx"):
         self.is_siesta = False
         self.is_orthogonal = False
-        xyz_fname = os.path.join(path, prefix + '.xyz')
-        fname = os.path.join(path, prefix + '.scfout')
+        xyz_fname = os.path.join(path, prefix + ".xyz")
+        fname = os.path.join(path, prefix + ".scfout")
         self.fname = fname
         self.R2kfactor = 2.0j * np.pi
         self.parse_scfoutput()
@@ -50,18 +79,18 @@ class OpenmxWrapper(AbstractTB):
         for i, R in enumerate(self.R):
             self.Rdict[tuple(R)] = i
         atoms = read(xyz_fname)
-        self.atoms = Atoms(atoms.get_chemical_symbols(),
-                           cell=self.cell,
-                           positions=self.positions)
+        self.atoms = Atoms(
+            atoms.get_chemical_symbols(), cell=self.cell, positions=self.positions
+        )
         self.norbs_to_basis(self.atoms, self.norbs)
         self.nspin = 2
         self.nbasis = self.nspin * self.norb
-        self._name='OpenMX'
+        self._name = "OpenMX"
 
     def solve(self, k):
         phase = np.exp(self.R2kfactor * (self.R @ k))
-        Hk = np.einsum('rij, r->ij', self.H, phase)
-        Sk = np.einsum('rij, r->ij', self.S, phase)
+        Hk = np.einsum("rij, r->ij", self.H, phase)
+        Sk = np.einsum("rij, r->ij", self.S, phase)
         return sl.eigh(Hk, Sk)
 
     def solve_all(self, kpts):
@@ -74,11 +103,11 @@ class OpenmxWrapper(AbstractTB):
 
     def HSE_k(self, k, convention=2):
         phase = np.exp(self.R2kfactor * (self.R @ k))
-        Hk = np.einsum('rij, r->ij', self.H, phase)
-        Sk = np.einsum('rij, r->ij', self.S, phase)
-        evalue, evec = sl.eigh(Hk, Sk)
+        Hk = np.einsum("rij, r->ij", self.H, phase)
+        Sk = np.einsum("rij, r->ij", self.S, phase)
+        # evalue, evec = sl.eigh(Hk, Sk)
+        evalue, evec = reorder_and_solve_and_back(Hk, Sk)
         return Hk, Sk, evalue, evec
-
 
     def HS_and_eigen(self, kpts):
         nk = len(kpts)
@@ -88,8 +117,8 @@ class OpenmxWrapper(AbstractTB):
         Sk = np.zeros((nk, self.nbasis, self.nbasis), dtype=complex)
         for ik, k in enumerate(kpts):
             phase = np.exp(self.R2kfactor * (self.R @ k))
-            Hk[ik] = np.einsum('rij, r->ij', self.H, phase)
-            Sk[ik] = np.einsum('rij, r->ij', self.S, phase)
+            Hk[ik] = np.einsum("rij, r->ij", self.H, phase)
+            Sk[ik] = np.einsum("rij, r->ij", self.S, phase)
             evals[ik], evecs[ik] = sl.eigh(Hk[ik], Sk[ik])
         return Hk, Sk, evals, evecs
 
@@ -102,19 +131,18 @@ class OpenmxWrapper(AbstractTB):
         sn = list(symbol_number(symbols).keys())
         for i, n in enumerate(norbs):
             for x in range(n):
-                self.basis .append((sn[i], f'orb{x+1}', 'up'))
-                self.basis .append((sn[i], f'orb{x+1}', 'down'))
+                self.basis.append((sn[i], f"orb{x+1}", "up"))
+                self.basis.append((sn[i], f"orb{x+1}", "down"))
         return self.basis
 
     def parse_scfoutput(self):
         argv0 = ffi.new("char[]", b"")
-        argv = ffi.new("char[]", bytes(self.fname, encoding='ascii'))
+        argv = ffi.new("char[]", bytes(self.fname, encoding="ascii"))
         lib.read_scfout([argv0, argv])
         lib.prepare_HSR()
         self.ncell = lib.TCpyCell + 1
         self.natom = lib.atomnum
-        self.norbs = np.copy(
-            asarray(ffi, lib.Total_NumOrbs, self.natom + 1)[1:])
+        self.norbs = np.copy(asarray(ffi, lib.Total_NumOrbs, self.natom + 1)[1:])
 
         if lib.SpinP_switch == 3:
             self.non_collinear = True
@@ -122,7 +150,9 @@ class OpenmxWrapper(AbstractTB):
             self.non_collinear = False
         else:
             raise ValueError(
-                " The value of SpinP_switch is %s. Can only get J from collinear and non-collinear mode."%lib.SpinP_switch)
+                " The value of SpinP_switch is %s. Can only get J from collinear and non-collinear mode."
+                % lib.SpinP_switch
+            )
 
         fnan = asarray(ffi, lib.FNAN, self.natom + 1)
 
@@ -135,8 +165,8 @@ class OpenmxWrapper(AbstractTB):
             ncn.append(asarray(ffi, lib.ncn[iatom + 1], fnan[iatom + 1] + 1))
         # atv
         #  x,y,and z-components of translation vector of
-        #periodically copied cells
-        #size: atv[TCpyCell+1][4];
+        # periodically copied cells
+        # size: atv[TCpyCell+1][4];
         atv = []
         for icell in range(self.ncell):
             atv.append(asarray(ffi, lib.atv[icell], 4))
@@ -174,47 +204,47 @@ class OpenmxWrapper(AbstractTB):
             for iR in range(0, self.ncell):
                 for ispin in range(lib.SpinP_switch + 1):
                     for iorb in range(lib.T_NumOrbs):
-                        HR[iR, ispin,
-                           iorb, :] = asarray(ffi, lib.HR[iR][ispin][iorb],
-                                              norb)
+                        HR[iR, ispin, iorb, :] = asarray(
+                            ffi, lib.HR[iR][ispin][iorb], norb
+                        )
 
             HR_imag = np.zeros([self.ncell, 3, lib.T_NumOrbs, lib.T_NumOrbs])
             for iR in range(0, self.ncell):
                 for ispin in range(3):
                     for iorb in range(lib.T_NumOrbs):
                         HR_imag[iR, ispin, iorb, :] = asarray(
-                            ffi, lib.HR_imag[iR][ispin][iorb], norb)
+                            ffi, lib.HR_imag[iR][ispin][iorb], norb
+                        )
 
             self.H = np.zeros(
-                [self.ncell, lib.T_NumOrbs * 2, lib.T_NumOrbs * 2],
-                dtype=complex)
+                [self.ncell, lib.T_NumOrbs * 2, lib.T_NumOrbs * 2], dtype=complex
+            )
 
             # up up
             for iR in range(self.ncell):
                 self.H[iR, ::2, ::2] = HR[iR, 0, :, :] + 1j * HR_imag[iR, 0, :, :]
                 # up down
-                self.H[iR, ::2,
-                   1::2] = HR[iR, 2, :, :] + 1j * (HR[iR, 3, :, :] +
-                                                   HR_imag[iR, 2, :, :])
+                self.H[iR, ::2, 1::2] = HR[iR, 2, :, :] + 1j * (
+                    HR[iR, 3, :, :] + HR_imag[iR, 2, :, :]
+                )
                 # down up
-                self.H[iR,
-                   1::2, ::2] = HR[iR, 2, :, :] - 1j * (HR[iR, 3, :, :] +
-                                                          HR_imag[iR, 2, :, :])
+                self.H[iR, 1::2, ::2] = HR[iR, 2, :, :] - 1j * (
+                    HR[iR, 3, :, :] + HR_imag[iR, 2, :, :]
+                )
                 # down down
                 self.H[iR, 1::2, 1::2] = HR[iR, 1, :, :] + 1j * HR_imag[iR, 1, :, :]
         else:  # collinear
-
             HR = np.zeros([self.ncell, 4, lib.T_NumOrbs, lib.T_NumOrbs])
             for iR in range(0, self.ncell):
                 for ispin in range(lib.SpinP_switch + 1):
                     for iorb in range(lib.T_NumOrbs):
-                        HR[iR, ispin,
-                           iorb, :] = asarray(ffi, lib.HR[iR][ispin][iorb],
-                                              norb)
+                        HR[iR, ispin, iorb, :] = asarray(
+                            ffi, lib.HR[iR][ispin][iorb], norb
+                        )
 
             self.H = np.zeros(
-                [self.ncell, lib.T_NumOrbs * 2, lib.T_NumOrbs * 2],
-                dtype=complex)
+                [self.ncell, lib.T_NumOrbs * 2, lib.T_NumOrbs * 2], dtype=complex
+            )
 
             # up up
             for iR in range(self.ncell):
@@ -227,19 +257,21 @@ class OpenmxWrapper(AbstractTB):
         for iR in range(0, self.ncell):
             for iorb in range(lib.T_NumOrbs):
                 SR[iR, iorb, :] = asarray(ffi, lib.SR[iR][iorb], norb)
-        self.S = np.kron( SR, np.eye(2))
+        self.S = np.kron(SR, np.eye(2))
         lib.free_HSR()
         lib.free_scfout()
         print("Loading from scfout file OK!")
 
+
 def test():
     openmx = OpenmxWrapper(
-        path='/home/hexu/projects/TB2J_example/OPENMX/SrMnO3_FM_SOC/')
-    #hsr = openmx.parse_scfoutput()
-    #from banddownfolder.plot import plot_band
-    #plot_band(hsr)
-    #plt.savefig('band.pdf')
-    #plt.show()
+        path="/home/hexu/projects/TB2J_example/OPENMX/SrMnO3_FM_SOC/"
+    )
+    # hsr = openmx.parse_scfoutput()
+    # from banddownfolder.plot import plot_band
+    # plot_band(hsr)
+    # plt.savefig('band.pdf')
+    # plt.show()
 
 
-#test()
+# test()
