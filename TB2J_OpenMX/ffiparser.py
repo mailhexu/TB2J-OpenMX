@@ -37,7 +37,7 @@ def asarray(ffi, ptr, length):
 
 
 def reorder(Hk):
-    n = np.shape(Hk)[0] / 2
+    n = np.shape(Hk)[0] // 2
     N = 2 * n
     Hk2 = np.zeros_like(Hk)
     Hk2[0:n, 0:n] = Hk[::2, ::2]
@@ -48,7 +48,7 @@ def reorder(Hk):
 
 
 def reorder_back(Hk2):
-    n = np.shape(Hk)[0] / 2
+    n = np.shape(Hk)[0] // 2
     N = 2 * n
     Hk2 = np.zeros_like(Hk)
     Hk2[::2, ::2] = Hk[0:n, 0:n]
@@ -58,11 +58,22 @@ def reorder_back(Hk2):
     return Hk2
 
 
+def reorder_back_evecs(evecs):
+    n = np.shape(evecs)[0] // 2
+    N = 2 * n
+    evecs2 = np.zeros_like(evecs)
+    evecs2[0::2, :] = evecs[0:n, :]
+    evecs2[1::2, :] = evecs[n:N, :]
+    # evecs2[::2, 1::2] = evecs[0:n, n:N]
+    # evecs2[1::2, ::2] = evecs[n:N, 0:n]
+    return evecs2
+
+
 def reorder_and_solve_and_back(Hk, Sk):
     Hk2 = reorder(Hk)
     Sk2 = reorder(Sk)
     evalue, evecs = sl.eigh(Hk2, Sk2)
-    evecs = reorder(evecs)
+    evecs = reorder_back_evecs(evecs)
     return evalue, evecs
 
 
