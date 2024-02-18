@@ -4,10 +4,10 @@ material:num-materials = 1
 #---------------------------------------------------
 material[1]:material-name=Mn
 material[1]:damping-constant=1.0
-material[1]:atomic-spin-moment=3.1398078537608916 !muB
+material[1]:atomic-spin-moment=3.1472975617997774 !muB
 material[1]:uniaxial-anisotropy-constant=0.0
 material[1]:material-element=Mn
-material[1]:initial-spin-direction = -2.080786898759401e-07,9.397095607277683e-06,0.9999999999558257
+material[1]:initial-spin-direction = 5.053558432699287e-06,4.401170405368794e-06,0.9999999999775456
 material[1]:uniaxial-anisotropy-direction = 0.0 , 0.0, 1.0
 #---------------------------------------------------
 # Interactions
