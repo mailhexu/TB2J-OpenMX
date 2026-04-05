@@ -3,44 +3,32 @@ from TB2J.exchange import ExchangeNCL, ExchangeCL
 import os
 
 
-def gen_exchange(path,
-                 prefix='openmx',
-                 magnetic_elements=[],
-                 kmesh=[5, 5, 5],
-                 emin=-11.0,
-                 emax=0.00,
-                 nz=100,
-                 exclude_orbs=[],
-                 Rcut=None,
-                 use_cache=False,
-                 description=None):
-    tbmodel=OpenmxWrapper(path, prefix)
-    if tbmodel.non_collinear:
-        Exchange=ExchangeNCL
-    else:
-        Exchange=ExchangeCL
-    print("Starting to calculate exchange.")
-    description=f"""Using OpenMX data: 
+def gen_exchange(path='./', prefix='openmx', **kwargs):
+    tbmodel = OpenmxWrapper(path, prefix)
+
+    # efermi is read from OpenMX data, not user input
+    kwargs['efermi'] = tbmodel.efermi
+
+    # Auto-generate description and prepend to any user-provided one
+    auto_desc = f"""Using OpenMX data: 
 path: {os.path.abspath(path)}
 prefix: {prefix}
 """
-    exchange = Exchange(
-            tbmodels=tbmodel,
-            atoms=tbmodel.atoms,
-            basis=tbmodel.basis,
-            efermi=tbmodel.efermi,
-            magnetic_elements=magnetic_elements,
-            kmesh=kmesh,
-            emin=emin,
-            emax=emax,
-            nz=nz,
-            exclude_orbs=exclude_orbs,
-            Rcut=Rcut,
-            use_cache=use_cache,
-            description=description)
-    exchange.run()
-    print("\n")
-    print("All calculation finsihed. The results are in TB2J_results directory.")
+    user_desc = kwargs.get('description') or ''
+    kwargs['description'] = auto_desc + user_desc
+
+    ExchangeClass = ExchangeNCL if tbmodel.non_collinear else ExchangeCL
+
+    print("Starting to calculate exchange.")
+    exchange = ExchangeClass(
+        tbmodels=tbmodel,
+        atoms=tbmodel.atoms,
+        basis=tbmodel.basis,
+        **kwargs,
+    )
+    output_path = kwargs.get('output_path', 'TB2J_results')
+    exchange.run(path=output_path)
+    print(f"\nAll calculation finished. The results are in {output_path} directory.")
 
 if __name__=='__main__':
     gen_exchange(
