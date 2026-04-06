@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64", "cffi"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "TB2J_OpenMX"
+version = "0.5.1"
+description = "TB2J_OpenMX: TB2J interface to OpenMX"
+readme = "README.md"
+license = {text = "GNU General Public License v3 (GPLv3)"}
+requires-python = ">=3.6"
+authors = [
+    {name = "Xu He", email = "mailhexu@gmail.com"},
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "ase",
+    "TB2J>=0.6.0",
+    "cffi",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[tool.setuptools.packages]
+find = {}
