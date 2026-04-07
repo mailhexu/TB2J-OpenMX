@@ -1,13 +1,15 @@
 material:num-materials = 1
 #---------------------------------------------------
-# Material 1 
+# Material 1
 #---------------------------------------------------
 material[1]:material-name=Mn
 material[1]:damping-constant=1.0
-material[1]:atomic-spin-moment=3.1472975617997774 !muB
+material[1]:atomic-spin-moment=3.2490154161706197 !muB
 material[1]:uniaxial-anisotropy-constant=0.0
 material[1]:material-element=Mn
-material[1]:initial-spin-direction = 5.053558432699287e-06,4.401170405368794e-06,0.9999999999775456
+material[1]:initial-spin-direction = 5.532192341139353e-06,4.598680415426413e-06,0.9999999999741235
 material[1]:uniaxial-anisotropy-direction = 0.0 , 0.0, 1.0
+# The following line is required for vampire 5 and later. 
+material[1]:unit-cell-category =  1
 #---------------------------------------------------
 # Interactions

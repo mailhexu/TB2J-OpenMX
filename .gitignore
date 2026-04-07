@@ -1,5 +1,6 @@
 doc/refs/*.pdf
 TB2J-OpenMX/cmod/*.so
+TB2J_OpenMX/cmod/_scfout_parser.c
 
 
 # Latex 
